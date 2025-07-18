@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Test File Generator - SpendWise-All</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #0ea5e9;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .bank-selector {
+            margin-bottom: 20px;
+        }
+        select, button {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        button {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0284c7;
+        }
+        .preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 12px;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        .instructions {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Excel Test File Generator</h1>
+        <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">
+            Generate sample bank statement Excel files for testing SpendWise-All upload functionality
+        </p>
+
+        <div class="instructions">
+            <strong>📋 Instructions:</strong>
+            <ol>
+                <li>Select a bank format below</li>
+                <li>Click "Generate Excel File" to download</li>
+                <li>Upload the downloaded .xlsx file to SpendWise-All</li>
+                <li>Test the AI categorization and processing</li>
+            </ol>
+        </div>
+
+        <div class="bank-selector">
+            <label for="bankSelect"><strong>Select Bank Format:</strong></label><br><br>
+            <select id="bankSelect" style="width: 100%;">
+                <option value="sbi">State Bank of India (SBI)</option>
+                <option value="hdfc">HDFC Bank</option>
+                <option value="icici">ICICI Bank</option>
+                <option value="axis">Axis Bank</option>
+                <option value="kotak">Kotak Mahindra Bank</option>
+            </select>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="generateExcel()">📥 Generate Excel File</button>
+            <button onclick="previewData()">👁️ Preview Data</button>
+        </div>
+
+        <div id="preview" class="preview" style="display: none;">
+            <h3>📋 Data Preview</h3>
+            <div id="previewContent"></div>
+        </div>
+
+        <div id="success" style="display: none;"></div>
+    </div>
+
+    <script>
+        const bankFormats = {
+            sbi: {
+                name: "State Bank of India",
+                headers: ["Date", "Description", "Debit", "Credit", "Balance"],
+                data: [
+                    ["2024-01-01", "Opening Balance", "", "", "50000.00"],
+                    ["2024-01-02", "ATM Withdrawal", "2000.00", "", "48000.00"],
+                    ["2024-01-03", "Salary Credit", "", "75000.00", "123000.00"],
+                    ["2024-01-05", "Grocery Store - Big Bazaar", "3500.00", "", "119500.00"],
+                    ["2024-01-07", "Electricity Bill Payment", "2800.00", "", "116700.00"],
+                    ["2024-01-10", "Online Transfer to John Doe", "5000.00", "", "111700.00"],
+                    ["2024-01-12", "Restaurant - Dominos", "850.00", "", "110850.00"],
+                    ["2024-01-15", "Fuel - Indian Oil", "3200.00", "", "107650.00"],
+                    ["2024-01-18", "Medical - Apollo Pharmacy", "1200.00", "", "106450.00"],
+                    ["2024-01-20", "Interest Credit", "", "125.50", "106575.50"],
+                    ["2024-01-22", "Mobile Recharge", "399.00", "", "106176.50"],
+                    ["2024-01-25", "Shopping - Amazon", "4500.00", "", "101676.50"],
+                    ["2024-01-28", "Rent Payment", "25000.00", "", "76676.50"],
+                    ["2024-01-30", "Dividend Credit", "", "2500.00", "79176.50"]
+                ]
+            },
+            hdfc: {
+                name: "HDFC Bank",
+                headers: ["Transaction Date", "Value Date", "Description", "Ref No./Cheque No.", "Debit Amount", "Credit Amount", "Balance"],
+                data: [
+                    ["01/01/2024", "01/01/2024", "Opening Balance", "OB001", "", "", "45000.00"],
+                    ["02/01/2024", "02/01/2024", "NEFT Credit - Salary", "NEFT001", "", "65000.00", "110000.00"],
+                    ["03/01/2024", "03/01/2024", "UPI Payment - Swiggy", "UPI001", "750.00", "", "109250.00"],
+                    ["05/01/2024", "05/01/2024", "Debit Card - Reliance Fresh", "DC001", "2800.00", "", "106450.00"],
+                    ["07/01/2024", "07/01/2024", "EMI - Home Loan", "EMI001", "35000.00", "", "71450.00"],
+                    ["10/01/2024", "10/01/2024", "UPI Payment - Uber", "UPI002", "450.00", "", "71000.00"],
+                    ["12/01/2024", "12/01/2024", "Online Shopping - Flipkart", "OS001", "8500.00", "", "62500.00"],
+                    ["15/01/2024", "15/01/2024", "Mutual Fund SIP", "MF001", "5000.00", "", "57500.00"],
+                    ["18/01/2024", "18/01/2024", "Insurance Premium", "INS001", "12000.00", "", "45500.00"],
+                    ["20/01/2024", "20/01/2024", "Interest Credit", "INT001", "", "89.50", "45589.50"],
+                    ["22/01/2024", "22/01/2024", "ATM Withdrawal", "ATM001", "5000.00", "", "40589.50"],
+                    ["25/01/2024", "25/01/2024", "Utility Bill - Gas", "UTIL001", "1200.00", "", "39389.50"],
+                    ["28/01/2024", "28/01/2024", "UPI Payment - Zomato", "UPI003", "650.00", "", "38739.50"],
+                    ["30/01/2024", "30/01/2024", "Cashback Credit", "CB001", "", "150.00", "38889.50"]
+                ]
+            },
+            icici: {
+                name: "ICICI Bank",
+                headers: ["Date", "Particulars", "Debit", "Credit", "Balance"],
+                data: [
+                    ["01-Jan-2024", "Opening Balance", "", "", "35000.00"],
+                    ["02-Jan-2024", "Salary - TCS Ltd", "", "80000.00", "115000.00"],
+                    ["03-Jan-2024", "ATM-WDL", "3000.00", "", "112000.00"],
+                    ["05-Jan-2024", "POS Purchase - More Supermarket", "4200.00", "", "107800.00"],
+                    ["07-Jan-2024", "IMPS - Rent Transfer", "30000.00", "", "77800.00"],
+                    ["10-Jan-2024", "UPI - Ola Cabs", "280.00", "", "77520.00"],
+                    ["12-Jan-2024", "Online Purchase - Myntra", "2500.00", "", "75020.00"],
+                    ["15-Jan-2024", "SIP - Mutual Fund", "10000.00", "", "65020.00"],
+                    ["18-Jan-2024", "Medical - Max Hospital", "8500.00", "", "56520.00"],
+                    ["20-Jan-2024", "Interest Credited", "", "95.20", "56615.20"],
+                    ["22-Jan-2024", "Mobile Bill - Airtel", "599.00", "", "56016.20"],
+                    ["25-Jan-2024", "Grocery - Spencer's", "3800.00", "", "52216.20"],
+                    ["28-Jan-2024", "Insurance Premium", "15000.00", "", "37216.20"],
+                    ["30-Jan-2024", "Cashback", "", "200.00", "37416.20"]
+                ]
+            },
+            axis: {
+                name: "Axis Bank",
+                headers: ["Tran Date", "Particulars", "Chq/Ref No", "Value Date", "Withdrawal Amt", "Deposit Amt", "Closing Balance"],
+                data: [
+                    ["01/01/24", "Opening Balance", "", "01/01/24", "", "", "42000.00"],
+                    ["02/01/24", "Salary Credit", "SAL001", "02/01/24", "", "70000.00", "112000.00"],
+                    ["03/01/24", "ATM Cash Withdrawal", "ATM001", "03/01/24", "4000.00", "", "108000.00"],
+                    ["05/01/24", "Debit Card - Big Bazaar", "DC001", "05/01/24", "5200.00", "", "102800.00"],
+                    ["07/01/24", "NEFT - House Rent", "NEFT001", "07/01/24", "28000.00", "", "74800.00"],
+                    ["10/01/24", "UPI - BookMyShow", "UPI001", "10/01/24", "600.00", "", "74200.00"],
+                    ["12/01/24", "Online - Amazon", "ON001", "12/01/24", "3200.00", "", "71000.00"],
+                    ["15/01/24", "SIP Debit", "SIP001", "15/01/24", "8000.00", "", "63000.00"],
+                    ["18/01/24", "Medical - Fortis", "MED001", "18/01/24", "6500.00", "", "56500.00"],
+                    ["20/01/24", "Interest Credit", "INT001", "20/01/24", "", "78.50", "56578.50"],
+                    ["22/01/24", "Utility - Electricity", "UTIL001", "22/01/24", "3200.00", "", "53378.50"],
+                    ["25/01/24", "Fuel - HP Petrol", "FUEL001", "25/01/24", "2800.00", "", "50578.50"],
+                    ["28/01/24", "Insurance - LIC", "INS001", "28/01/24", "18000.00", "", "32578.50"],
+                    ["30/01/24", "Reward Points", "REW001", "30/01/24", "", "500.00", "33078.50"]
+                ]
+            },
+            kotak: {
+                name: "Kotak Mahindra Bank",
+                headers: ["Date", "Description", "Debit", "Credit", "Balance"],
+                data: [
+                    ["01/01/2024", "Opening Balance", "", "", "38000.00"],
+                    ["02/01/2024", "Salary - Infosys", "", "85000.00", "123000.00"],
+                    ["03/01/2024", "ATM Withdrawal", "2500.00", "", "120500.00"],
+                    ["05/01/2024", "Swipe - Reliance Trends", "4800.00", "", "115700.00"],
+                    ["07/01/2024", "RTGS - Home Loan EMI", "32000.00", "", "83700.00"],
+                    ["10/01/2024", "UPI - Paytm Mall", "1200.00", "", "82500.00"],
+                    ["12/01/2024", "Net Banking - Flipkart", "6500.00", "", "76000.00"],
+                    ["15/01/2024", "Auto Debit - SIP", "12000.00", "", "64000.00"],
+                    ["18/01/2024", "POS - Apollo Pharmacy", "850.00", "", "63150.00"],
+                    ["20/01/2024", "Interest Credited", "", "105.25", "63255.25"],
+                    ["22/01/2024", "Bill Pay - Vodafone", "699.00", "", "62556.25"],
+                    ["25/01/2024", "UPI - Zomato", "450.00", "", "62106.25"],
+                    ["28/01/2024", "Cheque - Insurance", "20000.00", "", "42106.25"],
+                    ["30/01/2024", "Cashback Credit", "", "300.00", "42406.25"]
+                ]
+            }
+        };
+
+        function previewData() {
+            const selectedBank = document.getElementById('bankSelect').value;
+            const bankData = bankFormats[selectedBank];
+            
+            let tableHTML = `<h4>${bankData.name} Format</h4><table><thead><tr>`;
+            
+            // Headers
+            bankData.headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += `</tr></thead><tbody>`;
+            
+            // Data rows (show first 5)
+            bankData.data.slice(0, 5).forEach(row => {
+                tableHTML += `<tr>`;
+                row.forEach(cell => {
+                    tableHTML += `<td>${cell}</td>`;
+                });
+                tableHTML += `</tr>`;
+            });
+            
+            tableHTML += `</tbody></table>`;
+            tableHTML += `<p style="margin-top: 10px; color: #6b7280; font-size: 12px;">Showing first 5 rows of ${bankData.data.length} total transactions</p>`;
+            
+            document.getElementById('previewContent').innerHTML = tableHTML;
+            document.getElementById('preview').style.display = 'block';
+        }
+
+        function generateExcel() {
+            const selectedBank = document.getElementById('bankSelect').value;
+            const bankData = bankFormats[selectedBank];
+            
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const wsData = [bankData.headers, ...bankData.data];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Statement");
+            
+            // Generate filename
+            const filename = `${selectedBank.toUpperCase()}_Sample_Statement_${new Date().toISOString().split('T')[0]}.xlsx`;
+            
+            // Save file
+            XLSX.writeFile(wb, filename);
+            
+            // Show success message
+            document.getElementById('success').innerHTML = `
+                <div class="success">
+                    ✅ <strong>Excel file generated successfully!</strong><br>
+                    📁 File: <code>${filename}</code><br>
+                    📊 Contains ${bankData.data.length} sample transactions<br>
+                    🚀 Ready to upload to SpendWise-All!
+                </div>
+            `;
+            document.getElementById('success').style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                document.getElementById('success').style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize with preview
+        window.onload = function() {
+            previewData();
+        };
+    </script>
+</body>
+</html>

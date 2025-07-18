@@ -1,0 +1,15 @@
+Date,Description,Debit,Credit,Balance
+2024-01-01,Opening Balance,,,50000.00
+2024-01-02,ATM Withdrawal,2000.00,,48000.00
+2024-01-03,Salary Credit,,75000.00,123000.00
+2024-01-05,Grocery Store - Big Bazaar,3500.00,,119500.00
+2024-01-07,Electricity Bill Payment,2800.00,,116700.00
+2024-01-10,Online Transfer to John Doe,5000.00,,111700.00
+2024-01-12,Restaurant - Dominos,850.00,,110850.00
+2024-01-15,Fuel - Indian Oil,3200.00,,107650.00
+2024-01-18,Medical - Apollo Pharmacy,1200.00,,106450.00
+2024-01-20,Interest Credit,,125.50,106575.50
+2024-01-22,Mobile Recharge,399.00,,106176.50
+2024-01-25,Shopping - Amazon,4500.00,,101676.50
+2024-01-28,Rent Payment,25000.00,,76676.50
+2024-01-30,Dividend Credit,,2500.00,79176.50
